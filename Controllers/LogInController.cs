@@ -23,87 +23,48 @@ namespace EmployeeManagementWebsite.Controllers
             return View();
         }
 
-        [HttpGet]
-        public ActionResult Login()
-        {
-            return View();
-        }
-
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Login(string username, string password)
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
-                ViewBag.Error = "Username or password is empty!";
-                return View("Login");
+                TempData["Error"] = "Username or password is empty!";
+                return RedirectToAction("Index");
             }
 
-            // Convert username to byte array
-            var usernameBytes = Encoding.UTF8.GetBytes(username);
-
-            // Fetch the user from the database
-            var user = db.Users.FirstOrDefault(u => u.Username == usernameBytes);
+            byte[] usernameBytes = Encoding.UTF8.GetBytes(username);
+            var user = db.Users.ToList().SingleOrDefault(u => u.Username.SequenceEqual(usernameBytes));
 
             if (user != null)
             {
-                // Check if the hashed password matches the stored password
                 byte[] salt = GetSaltFromStoredPassword(user.Password);
                 byte[] hashedPassword = SHA256Hashing.HashPassword(password, salt);
                 byte[] storedHashedPassword = GetHashedPasswordFromStoredPassword(user.Password);
 
                 if (hashedPassword.SequenceEqual(storedHashedPassword))
                 {
-                    // Store the username in the session
                     Session["Username"] = username;
+                    Session["FullName"] = user.FullName; // Store the full name in the session
 
-                    // Generate a session token
-                    string sessionToken = GenerateSessionToken(username);
-
-                    // Store the session token in session or database
-                    Session["SessionToken"] = sessionToken;
-
-                    // Authentication successful
-                    return RedirectToAction("Index", "Home");
+                    return View("Index");
                 }
             }
 
-            ViewBag.Error = "Invalid username or password!";
-            return View("Login");
-        }
-
-        private string GenerateSessionToken(string username)
-        {
-            // Combine username with a secret key
-            string secretKey = "your_secret_key_here";
-            string combined = username + secretKey;
-
-            // Calculate SHA-256 hash
-            using (var sha256 = System.Security.Cryptography.SHA256.Create())
-            {
-                byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(combined));
-                // Convert hash to string (hexadecimal representation)
-                return BitConverter.ToString(hashBytes).Replace("-", "");
-            }
-        }
-
-        [HttpGet]
-        public ActionResult Logout()
-        {
-            // Invalidate the session token
-            Session.Remove("SessionToken");
-            return RedirectToAction("Index", "Home");
-        }
-
-        [HttpGet]
-        public ActionResult Signup()
-        {
-            return View();
+            TempData["Error"] = "Invalid username or password!";
+            return RedirectToAction("Index");
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Signup(string username, string password)
+        public ActionResult Signup(string username, string password, string confirmPassword, string fullName, string gender, string role, string department)
         {
+            if (password != confirmPassword)
+            {
+                TempData["Error"] = "Passwords do not match!";
+                return RedirectToAction("Index");
+            }
+
             try
             {
                 if (ModelState.IsValid)
@@ -115,23 +76,29 @@ namespace EmployeeManagementWebsite.Controllers
                     User newUser = new User
                     {
                         Username = usernameBytes,
-                        Password = CombineSaltAndPassword(salt, hashedPassword)
+                        Password = CombineSaltAndPassword(salt, hashedPassword),
+                        FullName = fullName,
+                        Gender = gender,
+                        Role = role,
+                        Department = department,
+                        Image = "" // Set image to an empty string or a default value
                     };
 
                     db.Users.Add(newUser);
                     db.SaveChanges();
-                    return RedirectToAction("Login", "Login");
+                    TempData["Success"] = "Sign up successful!";
+                    return RedirectToAction("Index");
                 }
-                return View();
+                return RedirectToAction("Index");
             }
             catch (Exception e)
             {
-                ViewBag.Error = "There was an error: " + e.Message;
-                return View();
+                // Log the exception or add more detailed error handling as needed
+                TempData["Error"] = "There was an error: " + e.InnerException?.Message ?? e.Message;
+                return RedirectToAction("Index");
             }
         }
 
-        // Utility method to combine salt and password
         private byte[] CombineSaltAndPassword(byte[] salt, byte[] hashedPassword)
         {
             var combined = new byte[salt.Length + hashedPassword.Length];
@@ -140,7 +107,6 @@ namespace EmployeeManagementWebsite.Controllers
             return combined;
         }
 
-        // Utility method to extract salt from stored password
         private byte[] GetSaltFromStoredPassword(byte[] storedPassword)
         {
             var salt = new byte[16];
@@ -148,7 +114,6 @@ namespace EmployeeManagementWebsite.Controllers
             return salt;
         }
 
-        // Utility method to extract hashed password from stored password
         private byte[] GetHashedPasswordFromStoredPassword(byte[] storedPassword)
         {
             var hashedPassword = new byte[storedPassword.Length - 16];
@@ -178,8 +143,6 @@ namespace EmployeeManagementWebsite.Controllers
         }
 
         // POST: LogIn/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "UserID,Username,Password,FullName,Gender,Image,Role,Department")] User user)
@@ -210,8 +173,6 @@ namespace EmployeeManagementWebsite.Controllers
         }
 
         // POST: LogIn/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "UserID,Username,Password,FullName,Gender,Image,Role,Department")] User user)
