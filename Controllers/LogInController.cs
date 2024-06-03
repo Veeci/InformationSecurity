@@ -45,7 +45,7 @@ namespace EmployeeManagementWebsite.Controllers
                 if (hashedPassword.SequenceEqual(storedHashedPassword))
                 {
                     Session["Username"] = username;
-                    Session["FullName"] = user.FullName; // Store the full name in the session
+                    Session["FullName"] = user.FullName; 
 
                     return View("Index");
                 }
@@ -81,7 +81,7 @@ namespace EmployeeManagementWebsite.Controllers
                         Gender = gender,
                         Role = role,
                         Department = department,
-                        Image = "" // Set image to an empty string or a default value
+                        Image = ""
                     };
 
                     db.Users.Add(newUser);
@@ -93,7 +93,6 @@ namespace EmployeeManagementWebsite.Controllers
             }
             catch (Exception e)
             {
-                // Log the exception or add more detailed error handling as needed
                 TempData["Error"] = "There was an error: " + e.InnerException?.Message ?? e.Message;
                 return RedirectToAction("Index");
             }
