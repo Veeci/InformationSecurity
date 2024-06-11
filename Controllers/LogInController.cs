@@ -20,7 +20,7 @@ namespace EmployeeManagementWebsite.Controllers
 
         public ActionResult EmployeeList()
         {
-            return View();
+            return View(db.Users.ToList());
         }
 
         [HttpPost]

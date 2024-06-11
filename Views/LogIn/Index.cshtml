@@ -108,29 +108,30 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                             <span class="navbar-toggler-icon">
                                 <i class="fas fa-bars"></i>
                             </span>
-
                         </button>
-
                         <div class="collapse navbar-collapse" id="navbarSupportedContent">
                             <ul class="navbar-nav ml-lg-auto text-center">
                                 <li class="nav-item active">
-                                    <a class="nav-link" href="index.html">
+                                    <a class="nav-link" href="@Url.Action("Index", "Login")">
                                         Home
                                         <span class="sr-only">(current)</span>
                                     </a>
                                 </li>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        Employers
-                                        <i class="fas fa-angle-down"></i>
-                                    </a>
-                                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                        <a class="dropdown-item" href="employer_list.html"> Employer List 1</a>
-                                    </div>
-                                </li>
+                                @if (isLoggedIn)
+                                {
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            Employees
+                                            <i class="fas fa-angle-down"></i>
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                            <a class="dropdown-item" href="@Url.Action("EmployeeList", "Login")"> Employee List 1</a>
+                                        </div>
+                                    </li>
+                                }
                             </ul>
-
                         </div>
+
                     </nav>
                 </header>
             </div>
