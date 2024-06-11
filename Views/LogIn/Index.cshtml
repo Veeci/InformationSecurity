@@ -46,6 +46,13 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                                 </div>
                             }
 
+                            @if (TempData["Error"] != null)
+                            {
+                                <div class="alert alert-danger">
+                                    @TempData["Error"]
+                                </div>
+                            }
+
                             @{
                                 string fullName = Session["FullName"] as string;
                                 bool isLoggedIn = !string.IsNullOrEmpty(fullName);
@@ -54,7 +61,7 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                             @if (isLoggedIn == false)
                             {
                                 <div class="col-md-4">
-                                    <span>"Welcome, Guest!"</span>
+                                    <span>Welcome, Guest!</span>
                                 </div>
                                 <div class="col-md-3 sign-btn">
                                     <a href="#" data-toggle="modal" data-target="#exampleModalCenter">

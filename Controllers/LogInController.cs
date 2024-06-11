@@ -33,25 +33,42 @@ namespace EmployeeManagementWebsite.Controllers
                 return RedirectToAction("Index");
             }
 
-            byte[] usernameBytes = Encoding.UTF8.GetBytes(username);
-            var user = db.Users.ToList().SingleOrDefault(u => u.Username.SequenceEqual(usernameBytes));
-
-            if (user != null)
+            try
             {
-                byte[] salt = GetSaltFromStoredPassword(user.Password);
-                byte[] hashedPassword = SHA256Hashing.HashPassword(password, salt);
-                byte[] storedHashedPassword = GetHashedPasswordFromStoredPassword(user.Password);
+                // Hash the provided username
+                byte[] hashedUsername = SHA256Hashing.Hash(username);
 
-                if (hashedPassword.SequenceEqual(storedHashedPassword))
+                // Retrieve the user from the database by verifying hashed username
+                var user = db.Users.ToList().SingleOrDefault(u => hashedUsername.SequenceEqual(u.Username));
+
+                if (user != null)
                 {
-                    Session["Username"] = username;
-                    Session["FullName"] = user.FullName; 
+                    // Hash the provided password
+                    byte[] hashedPassword = SHA256Hashing.Hash(password);
 
-                    return View("Index");
+                    if (hashedPassword.SequenceEqual(user.Password))
+                    {
+                        Session["Username"] = username; // Directly store the username in session
+                        Session["FullName"] = user.FullName;
+
+                        return View("Index");
+                    }
+                    else
+                    {
+                        // For debugging: Log mismatched password hashes
+                        TempData["Error"] = "Password mismatch!";
+                    }
+                }
+                else
+                {
+                    TempData["Error"] = "Username not found!";
                 }
             }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "An unexpected error occurred: " + ex.Message;
+            }
 
-            TempData["Error"] = "Invalid username or password!";
             return RedirectToAction("Index");
         }
 
@@ -69,19 +86,19 @@ namespace EmployeeManagementWebsite.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    byte[] salt = SHA256Hashing.GenerateSalt();
-                    byte[] hashedPassword = SHA256Hashing.HashPassword(password, salt);
-                    byte[] usernameBytes = Encoding.UTF8.GetBytes(username);
+                    // Hash the username and password
+                    byte[] hashedUsername = SHA256Hashing.Hash(username);
+                    byte[] hashedPassword = SHA256Hashing.Hash(password);
 
                     User newUser = new User
                     {
-                        Username = usernameBytes,
-                        Password = CombineSaltAndPassword(salt, hashedPassword),
+                        Username = hashedUsername,
+                        Password = hashedPassword,
                         FullName = fullName,
                         Gender = gender,
                         Role = role,
                         Department = department,
-                        Image = ""
+                        Image = "" // Set image to an empty string or a default value
                     };
 
                     db.Users.Add(newUser);
@@ -93,31 +110,9 @@ namespace EmployeeManagementWebsite.Controllers
             }
             catch (Exception e)
             {
-                TempData["Error"] = "There was an error: " + e.InnerException?.Message ?? e.Message;
+                TempData["Error"] = "There was an error: " + (e.InnerException?.Message ?? e.Message);
                 return RedirectToAction("Index");
             }
-        }
-
-        private byte[] CombineSaltAndPassword(byte[] salt, byte[] hashedPassword)
-        {
-            var combined = new byte[salt.Length + hashedPassword.Length];
-            Buffer.BlockCopy(salt, 0, combined, 0, salt.Length);
-            Buffer.BlockCopy(hashedPassword, 0, combined, salt.Length, hashedPassword.Length);
-            return combined;
-        }
-
-        private byte[] GetSaltFromStoredPassword(byte[] storedPassword)
-        {
-            var salt = new byte[16];
-            Buffer.BlockCopy(storedPassword, 0, salt, 0, salt.Length);
-            return salt;
-        }
-
-        private byte[] GetHashedPasswordFromStoredPassword(byte[] storedPassword)
-        {
-            var hashedPassword = new byte[storedPassword.Length - 16];
-            Buffer.BlockCopy(storedPassword, 16, hashedPassword, 0, hashedPassword.Length);
-            return hashedPassword;
         }
 
         // GET: LogIn/Details/5
