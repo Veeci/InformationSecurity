@@ -138,6 +138,8 @@
     <Compile Include="Models\Model1.cs" />
     <Compile Include="Models\SHA-256Hashing.cs" />
     <Compile Include="Models\User.cs" />
+    <Compile Include="Models\UserLoginAttempt.cs" />
+    <Compile Include="Models\UserLoginAttemptCache.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

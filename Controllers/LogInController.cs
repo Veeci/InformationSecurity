@@ -44,6 +44,14 @@ namespace EmployeeManagementWebsite.Controllers
                 //nếu có tồn tại user nào có username trùng với username được nhập vào 
                 if (user != null)
                 {
+                    var attempt = UserLoginAttemptCache.GetOrCreate(username);
+
+                    if (attempt.LockoutEnd.HasValue && DateTime.Now < attempt.LockoutEnd.Value)
+                    {
+                        TempData["Error"] = "Account is locked. Please try again later.";
+                        return RedirectToAction("Index");
+                    }
+
                     //Tiến hành băm tiếp mật khẩu được người dùng nhập vào
                     byte[] hashedPassword = SHA256Hashing.Hash(password);
 
@@ -53,12 +61,22 @@ namespace EmployeeManagementWebsite.Controllers
                         Session["Username"] = username; //Lưu username vào session
                         Session["FullName"] = user.FullName; //Lưu họ tên của use vào session
 
+                        UserLoginAttemptCache.Reset(username);
+
                         return View("Index");
                     }
                     else
                     {
-                        // Trường hợp mật khẩu được nhập vào không trùng với mật khẩu trong db
-                        TempData["Error"] = "Password mismatch!";
+                        attempt.FailedAttempts++;
+                        if (attempt.FailedAttempts >= 5)
+                        {
+                            attempt.LockoutEnd = DateTime.Now.AddMinutes(15);
+                            TempData["Error"] = "Account locked due to multiple failed login attempts.";
+                        }
+                        else
+                        {
+                            TempData["Error"] = "Password mismatch!";
+                        }
                     }
                 }
                 else
@@ -115,6 +133,15 @@ namespace EmployeeManagementWebsite.Controllers
                 TempData["Error"] = "There was an error: " + (e.InnerException?.Message ?? e.Message);
                 return RedirectToAction("Index");
             }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Logout()
+        {
+            Session.Clear();
+            TempData["Success"] = "You have successfully logged out.";
+            return RedirectToAction("Index");
         }
 
         // GET: LogIn/Details/5

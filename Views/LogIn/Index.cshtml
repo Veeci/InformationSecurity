@@ -37,8 +37,6 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                 <header>
                     <div class="top-head ml-lg-auto text-center">
                         <div class="row">
-
-
                             @if (TempData["Success"] != null)
                             {
                                 <div class="alert alert-success">
@@ -78,6 +76,14 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                             {
                                 <div class="col-md-4">
                                     <span>@(isLoggedIn ? $"Welcome Back, {fullName}!" : "Welcome Back!")</span>
+                                </div>
+                                <div class="col-md-3 sign-btn">
+                                    <form action="@Url.Action("Logout", "LogIn")" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-link">
+                                            <i class="fas fa-sign-out-alt"></i> Log Out
+                                        </button>
+                                    </form>
                                 </div>
                             }
                             <div class="search col-md-2">
