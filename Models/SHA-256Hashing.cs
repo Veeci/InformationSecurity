@@ -14,9 +14,11 @@ public static class SHA256Hashing
         }
     }
 
+    /*
     public static bool VerifyHash(string input, byte[] storedHash)
     {
         byte[] inputHash = Hash(input);
         return inputHash.SequenceEqual(storedHash);
     }
+    */
 }

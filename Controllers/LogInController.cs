@@ -35,27 +35,29 @@ namespace EmployeeManagementWebsite.Controllers
 
             try
             {
-                // Hash the provided username
+                //Băm username mà người dùng nhập vào khi đăng nhập
                 byte[] hashedUsername = SHA256Hashing.Hash(username);
 
-                // Retrieve the user from the database by verifying hashed username
+                //Lấy danh sách các username đã băm trong db, so sánh với username đã băm ở trên
                 var user = db.Users.ToList().SingleOrDefault(u => hashedUsername.SequenceEqual(u.Username));
 
+                //nếu có tồn tại user nào có username trùng với username được nhập vào 
                 if (user != null)
                 {
-                    // Hash the provided password
+                    //Tiến hành băm tiếp mật khẩu được người dùng nhập vào
                     byte[] hashedPassword = SHA256Hashing.Hash(password);
 
+                    //So sánh bản băm mật khẩu đó với mật khẩu của người dùng đã được băm trong db
                     if (hashedPassword.SequenceEqual(user.Password))
                     {
-                        Session["Username"] = username; // Directly store the username in session
-                        Session["FullName"] = user.FullName;
+                        Session["Username"] = username; //Lưu username vào session
+                        Session["FullName"] = user.FullName; //Lưu họ tên của use vào session
 
                         return View("Index");
                     }
                     else
                     {
-                        // For debugging: Log mismatched password hashes
+                        // Trường hợp mật khẩu được nhập vào không trùng với mật khẩu trong db
                         TempData["Error"] = "Password mismatch!";
                     }
                 }
@@ -86,7 +88,7 @@ namespace EmployeeManagementWebsite.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    // Hash the username and password
+                    // Băm username và password
                     byte[] hashedUsername = SHA256Hashing.Hash(username);
                     byte[] hashedPassword = SHA256Hashing.Hash(password);
 
@@ -98,7 +100,7 @@ namespace EmployeeManagementWebsite.Controllers
                         Gender = gender,
                         Role = role,
                         Department = department,
-                        Image = "" // Set image to an empty string or a default value
+                        Image = ""
                     };
 
                     db.Users.Add(newUser);
@@ -216,3 +218,9 @@ namespace EmployeeManagementWebsite.Controllers
         }
     }
 }
+/*
+    Sau khi đăng ký, tài khoản và mật khẩu sau khi băm sẽ được lưu vào csdl
+    Khi check trong csdl, tài khoản mật khẩu được lưu có 66 ký tự
+    Lí do: đầu ra của SHA-256 mặc định có 256 bit, tương ứng với 32 byte = 64 ký tự 16 bit
+    Thêm 2 ký tự 0x ở đầu mặc định được thêm vào do các ký tự đầu ra là hệ hex
+ */
