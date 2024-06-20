@@ -1,0 +1,45 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="zxx">
+<head>
+    <title>Login to Admin Account</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8" />
+    <link href="//fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/Content/Admin/Login/css/style.css" type="text/css" media="all" />
+    <link rel="stylesheet" href="~/Content/Admin/Login/css/font-awesome.min.css" type="text/css" media="all">
+</head>
+<body>
+    <section class="w3l-hotair-form">
+        <h1>Login to Admin account</h1>
+        <div class="container">
+            <div class="workinghny-form-grid">
+                <div class="main-hotair">
+                    <div class="content-wthree">
+                        <h2>Log In</h2>
+                        @if (TempData["Error"] != null)
+                        {
+                            <div class="alert alert-danger">@TempData["Error"]</div>
+                        }
+                        <form action="/Admins/Login" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="text" class="text" name="username" placeholder="User Name" required="" autofocus>
+                            <input type="password" class="password" name="password" placeholder="User Password" required="">
+                            <button class="btn" type="submit">Log In</button>
+                        </form>
+                        <p class="account">Don't have an account? <a href="/Admins/Signup">Register</a></p>
+                    </div>
+                    <div class="w3l_form align-self">
+                        <div class="left_grid_info">
+                            <img src="~/Content/Admin/Login/images/1.png" alt="" class="img-fluid">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
