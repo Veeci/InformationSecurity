@@ -1,0 +1,63 @@
+﻿@model EmployeeManagementWebsite.Models.User
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Delete</title>
+    <link rel="stylesheet" href="/Content/Admin/css/styledelete.css">
+
+</head>
+<body>
+    <h1>Are you sure you want to delete this?</h1>
+    <div>
+        <h2>User:</h2>
+        <hr />
+        <main class="cd__main">
+            <!-- Start DEMO HTML (Use the following code into your project)-->
+            <div class="profile-page">
+                <div class="content">
+                    <div class="content__cover">
+                        <div class="content__avatar"></div>
+                        <div class="content__bull">
+                            <span></span><span></span><span></span><span></span><span></span>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="content__title">
+                        <h1> @Html.DisplayFor(model => model.FullName)</h1><span></span>
+                    </div>
+                    <div class="content__description">
+                        <p>  <b>@Html.DisplayNameFor(model => model.Gender):</b>@Html.DisplayFor(model => model.Gender)</p>
+                        <p><b>@Html.DisplayNameFor(model => model.Role):</b>@Html.DisplayFor(model => model.Role)</p>
+                        <p><b> @Html.DisplayNameFor(model => model.Department):</b>@Html.DisplayFor(model => model.Department) </p>
+                    </div>
+                    <div class="content__button">
+                        <a class="button" href="/Admins/Index">
+                            <div class="button__border"></div>
+                            <div class="button__bg"></div>
+                            <p class="button__text">Back to list</p>
+                        </a>
+                        <br />
+
+                        @using (Html.BeginForm())
+                        {
+                            @Html.AntiForgeryToken()
+                            <div class="form-actions no-color">
+                                <input type="submit" value="Delete" style="display: inline; padding: 1.2rem 1.8rem; text-align: center; text-decoration: none; background: linear-gradient(100deg, #ff4086 10%, #fd8d76 100%); border-radius: 2rem; box-shadow: 0 4px 6px rgba(50,50,93,0.11), 0 1px 3px rgba(0,0,0,0.08); font-size: 1rem; color: #fff; cursor: pointer; border:none;" class="btn btn-default" />
+                            </div>
+                        }
+
+                    </div>
+
+                    
+                </div>
+            </div>
+    </div>
+</body>
+</html>
