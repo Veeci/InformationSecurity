@@ -95,6 +95,46 @@ namespace EmployeeManagementWebsite.Controllers
             return View();
         }
 
+        // GET: Login
+        public ActionResult Signup()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Signup(string username, string password, string fullName)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    // Băm username và password
+                    byte[] hashedUsername = SHA256Hashing.Hash(username);
+                    byte[] hashedPassword = SHA256Hashing.Hash(password);
+
+                    Admin newAdmin = new Admin
+                    {
+                        Username = hashedUsername,
+                        Password = hashedPassword,
+                        FullName = fullName,
+
+                    };
+
+                    db.Admins.Add(newAdmin);
+                    db.SaveChanges();
+                    TempData["Success"] = "Sign up successful!";
+                    return RedirectToAction("Index");
+                }
+                return RedirectToAction("Index");
+            }
+            catch (Exception e)
+            {
+                TempData["Error"] = "There was an error: " + (e.InnerException?.Message ?? e.Message);
+                return RedirectToAction("Index");
+            }
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Logout()
