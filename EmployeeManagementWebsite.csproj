@@ -2438,6 +2438,8 @@
     <Content Include="Content\css\fontawesome-all.css" />
     <Content Include="Content\css\style.css" />
     <Content Include="Content\css\style6.css" />
+    <Content Include="Content\css\styledelete.css" />
+    <Content Include="Content\css\styledetail.css" />
     <Content Include="Content\css\zoomslider.css" />
     <Content Include="Content\fonts\fontawesome-webfont.svg" />
     <Content Include="Content\images\1.jpg" />
@@ -2461,6 +2463,7 @@
     <Content Include="Content\images\job-1.jpg" />
     <Content Include="Content\images\job-2.jpg" />
     <Content Include="Content\images\mobile.png" />
+    <Content Include="Content\images\name.jpg" />
     <Content Include="Content\images\next.png" />
     <Content Include="Content\images\p1.jpg" />
     <Content Include="Content\images\p2.jpg" />
